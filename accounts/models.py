@@ -26,6 +26,8 @@ class UserManager (BaseUserManager):
             **extra_fields
         )
         user.is_admin = True
+        user.is_superuser = True
+        user.is_staff = True 
         user.save(using=self._db)
         return user
     
@@ -53,7 +55,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
                                                                                                                                                                                                         
     is_admin = models.BooleanField(_("is admin"), default=False)
-    is_bespoketeam = models.BooleanField(_("is bespoke team"), default=False)
+    is_staff = models.BooleanField(_("is staff"), default=False)
     is_customer = models.BooleanField(_("is customer"), default=False)
     is_partners = models.BooleanField(_("is partners"), default=False)
     is_first_login = models.BooleanField(_("is first login"), default=True)
