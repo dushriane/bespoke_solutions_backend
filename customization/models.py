@@ -4,6 +4,21 @@ from product.models import Product, ProductVariant
 from designs.models import Design
 
 # Create your models here.
+class CustomizationStatus(models.TextChoices):
+    PENDING = 'PENDING', 'Pending'
+    IN_REVIEW = 'IN_REVIEW', 'In Review'
+    APPROVED = 'APPROVED', 'Approved'
+    PRODUCTION = 'PRODUCTION', 'In Production'
+    COMPLETED = 'COMPLETED', 'Completed'
+    CANCELLED = 'CANCELLED', 'Cancelled'
+
+
+class AssignmentStatus(models.TextChoices):
+    ASSIGNED = 'ASSIGNED', 'Assigned'
+    IN_PROGRESS = 'IN_PROGRESS', 'In Progress'
+    COMPLETED = 'COMPLETED', 'Completed'
+    CANCELLED = 'CANCELLED', 'Cancelled'
+
 class Customization(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -16,7 +31,7 @@ class Customization(models.Model):
     design_notes = models.TextField(null=True, blank=True)
     preview_3d_config = models.JSONField(null=True, blank=True)
 
-    status = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=CustomizationStatus.choices, default=CustomizationStatus.PENDING, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,7 +65,7 @@ class DesignerAssignment(models.Model):
     deadline = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
-    status = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=AssignmentStatus.choices, default=AssignmentStatus.ASSIGNED, null=True, blank=True)
     remarks = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

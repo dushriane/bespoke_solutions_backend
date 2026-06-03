@@ -5,6 +5,16 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
+class ShipmentStatus(models.TextChoices):
+    CREATED = 'CREATED', _('Created')
+    PICKED_UP = 'PICKED_UP', _('Picked Up')
+    IN_TRANSIT = 'IN_TRANSIT', _('In Transit')
+    OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY', _('Out For Delivery')
+    DELIVERED = 'DELIVERED', _('Delivered')
+    RETURNED = 'RETURNED', _('Returned')
+    CANCELLED = 'CANCELLED', _('Cancelled')
+
+
 class Order(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -49,7 +59,7 @@ class Shipment(models.Model):
 
 class ShipmentStatusHistory(models.Model):
     shipment = models.ForeignKey(Shipment, related_name='status_history', on_delete=models.CASCADE)
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     updated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

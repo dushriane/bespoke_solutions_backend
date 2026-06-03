@@ -87,11 +87,19 @@ class VerificationCode(models.Model):
 
 
 # class for designer
+class DesignerAvailability(models.TextChoices):
+    AVAILABLE = 'AVAILABLE', _('Available')
+    BUSY = 'BUSY', _('Busy')
+    OFFLINE = 'OFFLINE', _('Offline')
+    UNKNOWN = 'UNKNOWN', _('Unknown')
+
+
+# class for designer
 class Designer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='designer_profile')
     specialization = models.CharField(max_length=255)
     experience_level = models.CharField(max_length=50)
-    availability_status = models.CharField(max_length=50)
+    availability_status = models.CharField(max_length=50, choices=DesignerAvailability.choices, default=DesignerAvailability.UNKNOWN)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
