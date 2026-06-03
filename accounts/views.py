@@ -4,7 +4,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from accounts.models import User, VerificationCode
-from accounts.serializers import UserSerializer, CustomTokenObtainPairSerializer
+from accounts.serializers import (
+    UserSerializer, 
+    CustomTokenObtainPairSerializer,
+    VerifyAccountSerializer,
+    RequestPasswordResetSerializer,
+    ResetPasswordSerializer
+)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
@@ -14,6 +20,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 class LoginMixin(APIView):
+    serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -29,6 +38,7 @@ class LoginMixin(APIView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 class VerifyAccountView(APIView):
+    serializer_class = VerifyAccountSerializer
     permission_classes = [AllowAny]
     
     def post(self, request, *args, **kwargs):
@@ -56,6 +66,7 @@ class VerifyAccountView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class RequestPasswordResetView(APIView):
+    serializer_class = RequestPasswordResetSerializer
     permission_classes = [AllowAny]
     
     def post(self, request, *args, **kwargs):
@@ -75,6 +86,7 @@ class RequestPasswordResetView(APIView):
             return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 class ResetPasswordView(APIView):
+    serializer_class = ResetPasswordSerializer
     permission_classes = [AllowAny]
     
     def post(self, request, *args, **kwargs):

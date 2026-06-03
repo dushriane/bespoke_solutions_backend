@@ -149,6 +149,18 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",), 
 }
 
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Authorization header using the Bearer scheme. Example: Bearer <token>",
+        }
+    },
+}
+
 # SMTP Email Settings (for production)
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
