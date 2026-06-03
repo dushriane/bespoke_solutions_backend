@@ -33,6 +33,29 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    username = None 
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+            if not user.check_password(password):
+                raise serializers.ValidationError({'password':'Invalid credentials'})
+            attrs['users'] = user
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'email':'User not found'})
+        
+        tokens = self.get_token(user)
+        
+        return {
+            'refresh': str(tokens),
+            'access': str(tokens.access_token),
+        }
+
     @classmethod
     def get_token(cls, user):
         User.objects.filter(id=user.id).update(last_login=datetime.datetime.now())

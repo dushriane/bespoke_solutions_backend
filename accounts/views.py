@@ -14,18 +14,19 @@ from accounts.serializers import (
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
+from drf_yasg.utils import swagger_auto_schema
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
 
 class LoginMixin(APIView):
-    serializer_class = CustomTokenObtainPairSerializer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(request_body=CustomTokenObtainPairSerializer)
     def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        # email = request.data.get('email')
+        # password = request.data.get('password')
 
         serializer = CustomTokenObtainPairSerializer(data=request.data)
 
@@ -38,9 +39,9 @@ class LoginMixin(APIView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 class VerifyAccountView(APIView):
-    serializer_class = VerifyAccountSerializer
     permission_classes = [AllowAny]
     
+    @swagger_auto_schema(request_body=VerifyAccountSerializer)
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         code = request.data.get('code')
@@ -66,9 +67,9 @@ class VerifyAccountView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class RequestPasswordResetView(APIView):
-    serializer_class = RequestPasswordResetSerializer
     permission_classes = [AllowAny]
     
+    @swagger_auto_schema(request_body=RequestPasswordResetSerializer)
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         if not email:
@@ -86,9 +87,9 @@ class RequestPasswordResetView(APIView):
             return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 class ResetPasswordView(APIView):
-    serializer_class = ResetPasswordSerializer
     permission_classes = [AllowAny]
     
+    @swagger_auto_schema(request_body=ResetPasswordSerializer)
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         code = request.data.get('code')
