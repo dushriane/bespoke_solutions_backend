@@ -15,6 +15,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
 from drf_yasg.utils import swagger_auto_schema
+from django.utils import timezone
+from datetime import timedelta
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_active=True)
@@ -51,10 +53,18 @@ class VerifyAccountView(APIView):
             
         try:
             user = User.objects.get(email=email)
-            verification = VerificationCode.objects.filter(user=user, code=code, is_verified=False).last()
+            verification = VerificationCode.objects.filter(
+                user=user, 
+                code=code, 
+                purpose='verification',
+                is_verified=False
+            ).last()
             
             if not verification:
-                return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if verification.is_expired():
+                return Response({'error': 'OTP has expired. Please request a new verification code.'}, status=status.HTTP_400_BAD_REQUEST)
                 
             verification.is_verified = True
             verification.save()
@@ -78,7 +88,13 @@ class RequestPasswordResetView(APIView):
         try:
             user = User.objects.get(email=email)
             code = random_with_N_digits(4)
-            VerificationCode.objects.create(user=user, code=code)
+            expires_at = timezone.now() + timedelta(minutes=10)
+            VerificationCode.objects.create(
+                user=user, 
+                code=code,
+                purpose='reset',
+                expires_at=expires_at
+            )
             
             send_email(user.full_name, code, "Password Reset Request", user.email, "emails/resetpasswordotp_email.html")
             
@@ -100,10 +116,18 @@ class ResetPasswordView(APIView):
             
         try:
             user = User.objects.get(email=email)
-            verification = VerificationCode.objects.filter(user=user, code=code, is_verified=False).last()
+            verification = VerificationCode.objects.filter(
+                user=user, 
+                code=code, 
+                purpose='reset',
+                is_verified=False
+            ).last()
             
             if not verification:
-                return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if verification.is_expired():
+                return Response({'error': 'OTP has expired. Please request a new reset code.'}, status=status.HTTP_400_BAD_REQUEST)
                 
             user.set_password(new_password)
             user.save()

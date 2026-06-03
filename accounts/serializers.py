@@ -4,6 +4,8 @@ from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
 import datetime
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.utils import timezone
+from datetime import timedelta
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,7 +29,13 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
         re_enter_password = validated_data.pop('re_enter_password')
         user = User.objects.create_user(**validated_data)
-        ver=VerificationCode.objects.create(user=user, code=random_with_N_digits(4))
+        expires_at = timezone.now() + timedelta(minutes=10)
+        ver = VerificationCode.objects.create(
+            user=user, 
+            code=random_with_N_digits(4),
+            purpose='verification',
+            expires_at=expires_at
+        )
 
         send_email(user.full_name, ver.code, "Account Verification Code", user.email, "emails/accountverification_email.html")
         return user
