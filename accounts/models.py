@@ -86,7 +86,7 @@ class VerificationCode(models.Model):
     code = models.CharField(max_length=4)
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, default='verification')
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(default=timezone.now)
     is_verified = models.BooleanField(default=False)
 
     def is_expired(self):
