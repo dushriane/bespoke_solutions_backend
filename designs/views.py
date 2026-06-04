@@ -7,6 +7,7 @@ class DesignViewSet(viewsets.ModelViewSet):
     queryset = Design.objects.all()
     serializer_class = DesignSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         user = self.request.user

@@ -7,11 +7,13 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ["get", "post", "put", "delete"]
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -29,4 +31,5 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     queryset = ProductVariant.objects.all()
     serializer_class = ProductVariantSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ["get", "post", "put", "delete"]
     

@@ -40,41 +40,41 @@ class LoginMixin(APIView):
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-class VerifyAccountView(APIView):
-    permission_classes = [AllowAny]
+# class VerifyAccountView(APIView):
+#     permission_classes = [AllowAny]
     
-    @swagger_auto_schema(request_body=VerifyAccountSerializer)
-    def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        code = request.data.get('code')
+#     @swagger_auto_schema(request_body=VerifyAccountSerializer)
+#     def post(self, request, *args, **kwargs):
+#         email = request.data.get('email')
+#         code = request.data.get('code')
         
-        if not email or not code:
-            return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
+#         if not email or not code:
+#             return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
             
-        try:
-            user = User.objects.get(email=email)
-            verification = VerificationCode.objects.filter(
-                user=user, 
-                code=code, 
-                purpose='verification',
-                is_verified=False
-            ).last()
+#         try:
+#             user = User.objects.get(email=email)
+#             verification = VerificationCode.objects.filter(
+#                 user=user, 
+#                 code=code, 
+#                 purpose='verification',
+#                 is_verified=False
+#             ).last()
             
-            if not verification:
-                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+#             if not verification:
+#                 return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
             
-            if verification.is_expired():
-                return Response({'error': 'OTP has expired. Please request a new verification code.'}, status=status.HTTP_400_BAD_REQUEST)
+#             if verification.is_expired():
+#                 return Response({'error': 'OTP has expired. Please request a new verification code.'}, status=status.HTTP_400_BAD_REQUEST)
                 
-            verification.is_verified = True
-            verification.save()
+#             verification.is_verified = True
+#             verification.save()
             
-            user.is_active = True
-            user.save()
+#             user.is_active = True
+#             user.save()
             
-            return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+#             return Response({'message': 'Account verified successfully'}, status=status.HTTP_200_OK)
+#         except User.DoesNotExist:
+#             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class RequestPasswordResetView(APIView):
     permission_classes = [AllowAny]

@@ -8,6 +8,7 @@ class CustomizationViewSet(viewsets.ModelViewSet):
     queryset = Customization.objects.all().order_by('-created_at')
     serializer_class = CustomizationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         user = self.request.user
@@ -35,11 +36,13 @@ class DesignPlacementViewSet(viewsets.ModelViewSet):
     queryset = DesignPlacement.objects.all()
     serializer_class = DesignPlacementSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
 class DesignerAssignmentViewSet(viewsets.ModelViewSet):
     queryset = DesignerAssignment.objects.all()
     serializer_class = DesignerAssignmentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         user = self.request.user
