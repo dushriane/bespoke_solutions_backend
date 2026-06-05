@@ -1,34 +1,35 @@
-from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from cart.models import Cart, CartItem
 from cart.serializers import CartSerializer, CartItemSerializer
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-# Create your views here.
 
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.all()
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]
 
+    def get_queryset(self):
+        return Cart.objects.filter(cart_id=str(self.request.user.id))
+
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        cart = serializer.save()
-        return Response(CartSerializer(cart).data, status=201)
+        # Each user gets one cart identified by their user ID
+        cart, _ = Cart.objects.get_or_create(cart_id=str(request.user.id))
+        return Response(CartSerializer(cart).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'])
+    def clear(self, request, pk=None):
+        cart = self.get_object()
+        cart.items.all().delete()
+        return Response({'message': 'Cart cleared'}, status=status.HTTP_200_OK)
+
 
 class CartItemViewSet(viewsets.ModelViewSet):
-    queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        cart_item = serializer.save()
-        return Response(CartItemSerializer(cart_item).data, status=201)
-    
-    
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__cart_id=str(self.request.user.id))

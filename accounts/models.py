@@ -76,18 +76,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
     
-class VerificationCode(models.Model):
-    PURPOSE_CHOICES = [
-        ('verification', 'Account Verification'),
-        ('reset', 'Password Reset'),
-    ]
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="verification_codes")
-    code = models.CharField(max_length=4)
-    purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, default='verification')
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=timezone.now)
-    is_verified = models.BooleanField(default=False)
+class PasswordResetOTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_otp")
+    code = models.CharField(max_length=6)
+    expires_at = models.DateTimeField(null=True, blank=True)
 
     def is_expired(self):
         """Check if the OTP code has expired (10 minutes validity)"""
@@ -98,8 +90,7 @@ class VerificationCode(models.Model):
         return not self.is_expired() and not self.is_verified
 
     def __str__(self):
-        return f"{self.code} ({self.purpose})"
-    
+        return f"OTP for {self.user.email}"
 
 
 # class for designer
