@@ -8,6 +8,7 @@ from .serializers import CustomizationSerializer, DesignerAssignmentSerializer, 
 class CustomizationViewSet(viewsets.ModelViewSet):
     serializer_class = CustomizationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):

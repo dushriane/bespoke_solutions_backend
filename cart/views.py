@@ -9,6 +9,7 @@ from cart.serializers import CartSerializer, CartItemSerializer
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self):
         return Cart.objects.filter(cart_id=str(self.request.user.id))
@@ -28,6 +29,7 @@ class CartViewSet(viewsets.ModelViewSet):
 class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self):
         return CartItem.objects.filter(cart__cart_id=str(self.request.user.id))

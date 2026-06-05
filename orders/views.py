@@ -11,6 +11,7 @@ from orders.serializers import (
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self):
         user = self.request.user
@@ -28,6 +29,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self):
         return OrderItem.objects.filter(order__in=Order.objects.all())

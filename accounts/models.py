@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class UserManager (BaseUserManager):
@@ -51,7 +52,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     address = models.TextField(_("address"), blank=True)
 
     is_active = models.BooleanField(_("is active"), default=True)
-    user_type = models.CharField(_("user type"), max_length=20, choices=USER_TYPE_CHOICES, default=USER)
+    user_type = models.CharField(_("user type"), max_length=20, choices=USER_TYPE_CHOICES, default=CUSTOMER)
 
                                                                                                                                                                                                         
     is_admin = models.BooleanField(_("is admin"), default=False)
@@ -79,6 +80,14 @@ class PasswordResetOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_otp")
     code = models.CharField(max_length=6)
     expires_at = models.DateTimeField(null=True, blank=True)
+
+    def is_expired(self):
+        """Check if the OTP code has expired (10 minutes validity)"""
+        return timezone.now() > self.expires_at
+    
+    def is_valid(self):
+        """Check if code is valid (not expired and not yet verified)"""
+        return not self.is_expired() and not self.is_verified
 
     def __str__(self):
         return f"OTP for {self.user.email}"

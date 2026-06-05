@@ -1,0 +1,1 @@
+web: gunicorn bespoke_solutions.wsgi:application
