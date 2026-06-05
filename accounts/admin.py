@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from accounts.models import (
     User,
-    VerificationCode,
     Designer,
     ExternalPartner,
     Address,
@@ -33,14 +32,6 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-
-@admin.register(VerificationCode)
-class VerificationCodeAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "code", "purpose", "is_verified", "created_at", "expires_at")
-    search_fields = ("user__email", "user__full_name", "code")
-    list_filter = ("purpose", "is_verified", "created_at", "expires_at")
-    ordering = ("-created_at",)
-    sortable_by = ("id", "user", "code", "purpose", "is_verified", "created_at", "expires_at")
 
 
 @admin.register(Designer)

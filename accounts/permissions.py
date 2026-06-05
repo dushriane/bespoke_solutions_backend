@@ -15,7 +15,7 @@ class BaseAuthPermission(BasePermission):
 class IsPartner(BasePermission):
     pass
 
-class IsBespokeTeam(BasePermission):
+class IsStaff(BasePermission):
     pass
 
 class IsCustomer(BasePermission):
