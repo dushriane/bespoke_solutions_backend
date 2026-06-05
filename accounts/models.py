@@ -75,15 +75,13 @@ class User(AbstractBaseUser,PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
     
-class VerificationCode(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="verification_codes")
-    code = models.CharField(max_length=4)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(default=False)
+class PasswordResetOTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_otp")
+    code = models.CharField(max_length=6)
+    expires_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.code
-    
+        return f"OTP for {self.user.email}"
 
 
 # class for designer

@@ -6,11 +6,10 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Bespoke Solution API",
+        title="Bespoke Solutions API",
         default_version="v1",
-        description="API Documentation for the custom bespoke platform.",
-        terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@example.local"),
+        description="API Documentation for the Bespoke Solutions platform.",
+        contact=openapi.Contact(email="contact@bespokesolutions.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
@@ -19,14 +18,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/product/', include('product.urls')),
-    path('api/customization/', include('customization.urls')),
+
+    # Core API routes
+    path('api/auth/', include('accounts.urls')),
+    path('api/products/', include('product.urls')),
     path('api/designs/', include('designs.urls')),
-    path('api/accounts/', include('accounts.urls')),
+    path('api/customization/', include('customization.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
 
-    #swagger and redoc routes
+    # Docs
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
