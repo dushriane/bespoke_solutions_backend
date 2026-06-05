@@ -11,7 +11,6 @@ from accounts.serializers import UserSerializer, CustomTokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
-from drf_yasg.utils import swagger_auto_schema
 from django.utils import timezone
 from datetime import timedelta
 

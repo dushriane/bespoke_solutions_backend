@@ -2,9 +2,6 @@ from rest_framework import serializers
 from accounts.models import User
 import datetime
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.utils import timezone
-from datetime import timedelta
-
 
 class UserSerializer(serializers.ModelSerializer):
     re_enter_password = serializers.CharField(write_only=True)
@@ -19,9 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('re_enter_password'):
-            raise serializers.ValidationError({"password": "Password and re-entered password do not match."})
+            raise serializers.ValidationError({
+                "password": "Password and re-entered password do not match."
+                })
         if User.objects.filter(email=attrs.get('email')).exists():
-            raise serializers.ValidationError({"email": "Email already exists."})
+            raise serializers.ValidationError({
+                "email": "Email already exists."
+                })
         return attrs
 
     def create(self, validated_data):
@@ -41,10 +42,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         try:
             user = User.objects.get(email=email)
             if not user.check_password(password):
-                raise serializers.ValidationError({'password':'Invalid credentials'})
+                raise serializers.ValidationError({
+                    'password':'Invalid credentials'
+                    })
             attrs['users'] = user
         except User.DoesNotExist:
-            raise serializers.ValidationError({'email':'User not found'})
+            raise serializers.ValidationError({
+                'email':'User not found'
+                })
         
         tokens = self.get_token(user)
         
