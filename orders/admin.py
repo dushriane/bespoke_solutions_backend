@@ -4,11 +4,21 @@ from orders.models import Order, OrderItem, Payment, Shipment, ShipmentStatusHis
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "price", "created_at", "updated_at")
-    search_fields = ("name", "description")
-    list_filter = ("created_at", "updated_at")
-    ordering = ("-created_at",)
-    sortable_by = ("id", "name", "price", "created_at", "updated_at")
+    list_display = (
+        "id",
+        "user",
+        "subtotal",
+        "tax_amount",
+        "delivery_fee",
+        "total_amount",
+        "order_status",
+        "payment_status",
+        "placed_at",
+    )
+    list_filter = ("order_status", "payment_status", "placed_at")
+    search_fields = ("id", "user__email", "user__full_name")
+    readonly_fields = ("id", "placed_at", "created_at", "updated_at")
+    autocomplete_fields = ("user", "cart", "address", "tax_information", "partner")
 
 
 @admin.register(OrderItem)

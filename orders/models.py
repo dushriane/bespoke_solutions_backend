@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.utils.translation import gettext_lazy as _
+from accounts.models import User, Address, TaxInformation, ExternalPartner
+from cart.models import Cart
+
 
 # Create your models here.
 
@@ -16,14 +17,26 @@ class ShipmentStatus(models.TextChoices):
 
 
 class Order(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    tax_information = models.ForeignKey(TaxInformation, on_delete=models.SET_NULL, null=True, blank=True)
+    partner = models.ForeignKey(ExternalPartner, on_delete=models.SET_NULL, null=True, blank=True)
+
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    order_status = models.CharField(max_length=50, default='pending')
+    payment_status = models.CharField(max_length=50, default='unpaid')
+
+    placed_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.total_amount
 
 
 class OrderItem(models.Model):
