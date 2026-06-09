@@ -6,13 +6,11 @@ from rest_framework import status
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from django.utils import timezone
 from datetime import timedelta
-from accounts.models import User, PasswordResetOTP
-from accounts.serializers import UserSerializer, CustomTokenObtainPairSerializer
+from accounts.models import Address, User, PasswordResetOTP
+from accounts.serializers import UserSerializer, CustomTokenObtainPairSerializer, AddressSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from utils.genotpcode import random_with_N_digits
 from utils.sendemail import send_email
-from django.utils import timezone
-from datetime import timedelta
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -115,3 +113,15 @@ class ResetPasswordView(APIView):
         otp.delete()
 
         return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

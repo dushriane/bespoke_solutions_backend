@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import User
+from accounts.models import Address, User
 import datetime
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -67,3 +67,54 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['phone_number'] = user.phone_number
         token['user_type'] = user.user_type
         return token
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Address
+        fields = [
+            'id',
+            'user',
+            'street',
+            'village',
+            'cell',
+            'sector',
+            'district',
+            'country',
+            'is_default',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+    def validate(self, data):
+        # Ensure at least street and district are provided
+        if not data.get('street'):
+            raise serializers.ValidationError({"street": "Street is required."})
+        
+        if not data.get('district'):
+            raise serializers.ValidationError({"district": "District is required."})
+        
+        # If setting as default, ensure user doesn't already have a default address
+        if data.get('is_default'):
+            user = self.context['request'].user if 'request' in self.context else None
+            if user:
+                # Check if user already has a default address
+                existing_default = user.addresses.filter(is_default=True)
+                
+                # If updating an existing address
+                if self.instance:
+                    # Exclude the current instance from the check
+                    existing_default = existing_default.exclude(id=self.instance.id)
+                
+                if existing_default.exists():
+                    raise serializers.ValidationError({
+                        "is_default": "User already has a default address. Please unset the existing default address first."
+                    })
+                
+        return data
+
+    def create(self, validated_data):
+        # user will be set in the view's perform_create
+        return super().create(validated_data)

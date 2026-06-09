@@ -3,9 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from accounts.models import User, Address, TaxInformation, ExternalPartner
 from cart.models import Cart
 
-
-# Create your models here.
-
 class ShipmentStatus(models.TextChoices):
     CREATED = 'CREATED', _('Created')
     PICKED_UP = 'PICKED_UP', _('Picked Up')
@@ -14,6 +11,18 @@ class ShipmentStatus(models.TextChoices):
     DELIVERED = 'DELIVERED', _('Delivered')
     RETURNED = 'RETURNED', _('Returned')
     CANCELLED = 'CANCELLED', _('Cancelled')
+
+class OrderStatus(models.TextChoices):
+    NEW = 'NEW', _('New')
+    IN_PRODUCTION = 'IN_PRODUCTION', _('In Production')
+    REVIEW = 'REVIEW', _('Review')
+    DONE = 'DONE', _('Done')
+
+class PaymentStatus(models.TextChoices):
+    FAILED = 'FAILED', _('Failed')
+    SUCCESSFUL = 'SUCCESSFUL', _('Successful')
+    CANCELLED = 'CANCELLED', _('Cancelled')
+    PENDING = 'PENDING', _('Pending')
 
 
 class Order(models.Model):
@@ -28,8 +37,8 @@ class Order(models.Model):
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    order_status = models.CharField(max_length=50, default='pending')
-    payment_status = models.CharField(max_length=50, default='unpaid')
+    order_status = models.CharField(max_length=50, choices=OrderStatus.choices, default=OrderStatus.NEW)
+    payment_status = models.CharField(max_length=50, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
 
     placed_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,6 +63,8 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50)
     payment_date = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(max_length=50, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
+    transaction_reference = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return f"Payment of {self.amount} for Order {self.order.id}"

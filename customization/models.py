@@ -2,13 +2,11 @@ from django.db import models
 from accounts.models import User
 from product.models import Product, ProductVariant
 from designs.models import Design
+from orders.models import OrderItem
 
-# Create your models here.
+
 class CustomizationStatus(models.TextChoices):
-    PENDING = 'PENDING', 'Pending'
-    IN_REVIEW = 'IN_REVIEW', 'In Review'
-    APPROVED = 'APPROVED', 'Approved'
-    PRODUCTION = 'PRODUCTION', 'In Production'
+    DRAFT = 'DRAFT', 'Draft'
     COMPLETED = 'COMPLETED', 'Completed'
     CANCELLED = 'CANCELLED', 'Cancelled'
 
@@ -31,7 +29,7 @@ class Customization(models.Model):
     design_notes = models.TextField(null=True, blank=True)
     preview_3d_config = models.JSONField(null=True, blank=True)
 
-    status = models.CharField(max_length=50, choices=CustomizationStatus.choices, default=CustomizationStatus.PENDING, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=CustomizationStatus.choices, default=CustomizationStatus.DRAFT)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -57,7 +55,7 @@ class DesignPlacement(models.Model):
 
 class DesignerAssignment(models.Model):
     customization = models.ForeignKey(Customization, on_delete=models.CASCADE)
-    order_item = models.ForeignKey('orders.OrderItem', on_delete=models.CASCADE, null=True, blank=True) #change here
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, null=True, blank=True) #change here
     designer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='designer_assignments')
     assigned_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assignments_given')
 
