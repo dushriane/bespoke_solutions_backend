@@ -25,7 +25,7 @@ class Customization(models.Model):
 
     design_name = models.CharField(max_length=255, null=True, blank=True)
     placement = models.CharField(max_length=100, null=True, blank=True)
-    custom_text = models.TextField(null=True, blank=True)
+    image_url = models.TextField(null=True, blank=True)
     design_notes = models.TextField(null=True, blank=True)
     preview_3d_config = models.JSONField(null=True, blank=True)
 
